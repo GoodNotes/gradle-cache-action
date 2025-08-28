@@ -97,15 +97,15 @@
          version: utils.getCacheVersion(paths, compressionMethod, enableCrossOsArchive)
         }, response = yield twirpClient.GetCacheEntryDownloadURL(request);
         if (!response.ok) return void core.debug(`Cache not found for version ${request.version} of keys: ${keys.join(", ")}`);
-        if (core.info(`Cache hit for: ${request.key}`), null == options ? void 0 : options.lookupOnly) return core.info("Lookup only - skipping download"), 
+        if (core.debug(`Cache hit for: ${request.key}`), null == options ? void 0 : options.lookupOnly) return core.debug("Lookup only - skipping download"), 
         response.matchedKey;
         archivePath = path.join(yield utils.createTempDirectory(), utils.getCacheFileName(compressionMethod)), 
         core.debug(`Archive path: ${archivePath}`), core.debug(`Starting download of archive to: ${archivePath}`), 
         yield cacheHttpClient.downloadCache(response.signedDownloadUrl, archivePath, options);
         const archiveFileSize = utils.getArchiveFileSizeInBytes(archivePath);
-        return core.info(`Cache Size: ~${Math.round(archiveFileSize / 1048576)} MB (${archiveFileSize} B)`), 
+        return core.debug(`Cache Size: ~${Math.round(archiveFileSize / 1048576)} MB (${archiveFileSize} B)`), 
         core.isDebug() && (yield (0, tar_1.listTar)(archivePath, compressionMethod)), yield (0, 
-        tar_1.extractTar)(archivePath, compressionMethod), core.info("Cache restored successfully"), 
+        tar_1.extractTar)(archivePath, compressionMethod), core.debug("Cache restored successfully"), 
         response.matchedKey;
        } catch (error) {
         if (error.name === ValidationError.name) throw error;
@@ -132,14 +132,14 @@
          enableCrossOsArchive
         });
         if (!(null == cacheEntry ? void 0 : cacheEntry.archiveLocation)) return;
-        if (null == options ? void 0 : options.lookupOnly) return core.info("Lookup only - skipping download"), 
+        if (null == options ? void 0 : options.lookupOnly) return core.debug("Lookup only - skipping download"), 
         cacheEntry.cacheKey;
         archivePath = path.join(yield utils.createTempDirectory(), utils.getCacheFileName(compressionMethod)), 
         core.debug(`Archive Path: ${archivePath}`), yield cacheHttpClient.downloadCache(cacheEntry.archiveLocation, archivePath, options), 
         core.isDebug() && (yield (0, tar_1.listTar)(archivePath, compressionMethod));
         const archiveFileSize = utils.getArchiveFileSizeInBytes(archivePath);
-        return core.info(`Cache Size: ~${Math.round(archiveFileSize / 1048576)} MB (${archiveFileSize} B)`), 
-        yield (0, tar_1.extractTar)(archivePath, compressionMethod), core.info("Cache restored successfully"), 
+        return core.debug(`Cache Size: ~${Math.round(archiveFileSize / 1048576)} MB (${archiveFileSize} B)`), 
+        yield (0, tar_1.extractTar)(archivePath, compressionMethod), core.debug("Cache restored successfully"), 
         cacheEntry.cacheKey;
        } catch (error) {
         if (error.name === ValidationError.name) throw error;
@@ -1023,7 +1023,7 @@
        });
       }(httpClient, cacheId, archivePath, options), core.debug("Commiting cache");
       const cacheSize = utils.getArchiveFileSizeInBytes(archivePath);
-      core.info(`Cache Size: ~${Math.round(cacheSize / 1048576)} MB (${cacheSize} B)`);
+      core.debug(`Cache Size: ~${Math.round(cacheSize / 1048576)} MB (${cacheSize} B)`);
       const commitCacheResponse = yield function(httpClient, cacheId, filesize) {
        return __awaiter(this, void 0, void 0, function*() {
         const commitCacheRequest = {
@@ -1035,7 +1035,7 @@
        });
       }(httpClient, cacheId, cacheSize);
       if (!(0, requestUtils_1.isSuccessStatusCode)(commitCacheResponse.statusCode)) throw new Error(`Cache service responded with ${commitCacheResponse.statusCode} during commit cache.`);
-      core.info("Cache saved successfully");
+      core.debug("Cache saved successfully");
      }
     });
    };
@@ -1323,7 +1323,7 @@
     display() {
      if (this.displayedComplete) return;
      const transferredBytes = this.segmentOffset + this.receivedBytes, percentage = (transferredBytes / this.contentLength * 100).toFixed(1), downloadSpeed = (transferredBytes / 1048576 / ((Date.now() - this.startTime) / 1e3)).toFixed(1);
-     core.info(`Received ${transferredBytes} of ${this.contentLength} (${percentage}%), ${downloadSpeed} MBs/sec`), 
+     core.debug(`Received ${transferredBytes} of ${this.contentLength} (${percentage}%), ${downloadSpeed} MBs/sec`), 
      this.isDone() && (this.displayedComplete = !0);
     }
     onProgress() {
@@ -2031,7 +2031,7 @@
     display() {
      if (this.displayedComplete) return;
      const transferredBytes = this.sentBytes, percentage = (transferredBytes / this.contentLength * 100).toFixed(1), uploadSpeed = (transferredBytes / 1048576 / ((Date.now() - this.startTime) / 1e3)).toFixed(1);
-     core.info(`Sent ${transferredBytes} of ${this.contentLength} (${percentage}%), ${uploadSpeed} MBs/sec`), 
+     core.debug(`Sent ${transferredBytes} of ${this.contentLength} (${percentage}%), ${uploadSpeed} MBs/sec`), 
      this.isDone() && (this.displayedComplete = !0);
     }
     onProgress() {
@@ -3710,7 +3710,7 @@
        this._debug(`exec tool: ${this.toolPath}`), this._debug("arguments:");
        for (const arg of this.args) this._debug(`   ${arg}`);
        const optionsNonNull = this._cloneExecOptions(this.options);
-       !optionsNonNull.silent && optionsNonNull.outStream && optionsNonNull.outStream.write(this._getCommandString(optionsNonNull) + os.EOL);
+    //    !optionsNonNull.silent && optionsNonNull.outStream && optionsNonNull.outStream.write(this._getCommandString(optionsNonNull) + os.EOL);
        const state = new ExecState(optionsNonNull, this.toolPath);
        if (state.on("debug", message => {
         this._debug(message);
